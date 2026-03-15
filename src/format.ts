@@ -5,7 +5,29 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+/** Format task for lists — description truncated to 200 chars. */
 export function formatTask(t: any): string {
+  const parts = _formatTaskHeader(t);
+  if (t.description) {
+    const desc =
+      t.description.length > 200
+        ? t.description.slice(0, 200) + "…"
+        : t.description;
+    parts.push(`  Description: ${desc}`);
+  }
+  return parts.join("\n");
+}
+
+/** Format task with FULL description — for mono_get_task. */
+export function formatTaskFull(t: any): string {
+  const parts = _formatTaskHeader(t);
+  if (t.description) {
+    parts.push(`  Description: ${t.description}`);
+  }
+  return parts.join("\n");
+}
+
+function _formatTaskHeader(t: any): string[] {
   const parts = [
     `${t.identifier || t.id} [${t.status}] ${t.title}`,
     `  ID: ${t.id}`,
@@ -16,14 +38,7 @@ export function formatTask(t: any): string {
   if (t.product_id) parts.push(`  Product: ${t.product_id}`);
   if (t.due_date) parts.push(`  Due: ${t.due_date}`);
   if (t.labels?.length) parts.push(`  Labels: ${t.labels.join(", ")}`);
-  if (t.description) {
-    const desc =
-      t.description.length > 200
-        ? t.description.slice(0, 200) + "..."
-        : t.description;
-    parts.push(`  Description: ${desc}`);
-  }
-  return parts.join("\n");
+  return parts;
 }
 
 export function formatTaskList(tasks: any[], total?: number): string {
