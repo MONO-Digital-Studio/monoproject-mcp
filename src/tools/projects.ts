@@ -54,8 +54,45 @@ export function registerProjectTools(server: McpServer, client: ApiClient) {
     },
     ({ project_id }) =>
       run(async () => {
-        const data = await client.get<any>(`${client.ws()}/projects/${project_id}/summary`);
-        return ok(JSON.stringify(data, null, 2));
+        // Assemble summary from existing endpoints (no dedicated /summary route)
+        const [project, tasks, sprints, members] = await Promise.all([
+          client.get<any>(`${client.ws()}/projects/${project_id}`),
+          client.get<any>(`${client.ws()}/projects/${project_id}/tasks`, { limit: 500 }),
+          client.get<any>(`${client.ws()}/projects/${project_id}/sprints`),
+          client.get<any>(`${client.ws()}/projects/${project_id}/members`).catch(() => []),
+        ]);
+
+        const p = project.data || project;
+        const taskList: any[] = tasks.data || tasks || [];
+        const sprintList: any[] = sprints.data || sprints || [];
+        const memberList: any[] = members.data || members || [];
+
+        // Task stats by status
+        const statusCounts: Record<string, number> = {};
+        for (const t of taskList) {
+          const s = t.status || "unknown";
+          statusCounts[s] = (statusCounts[s] || 0) + 1;
+        }
+
+        const activeSprint = sprintList.find((s: any) => s.status === "active");
+
+        const lines = [
+          `# ${p.name} [${p.key}]`,
+          ``,
+          `## Task Statistics (${taskList.length} total)`,
+          ...Object.entries(statusCounts).map(([s, c]) => `- ${s}: ${c}`),
+          ``,
+          `## Team`,
+          `- Members: ${memberList.length}`,
+          ``,
+          `## Sprints`,
+          `- Total: ${sprintList.length}`,
+          activeSprint
+            ? `- Active: ${activeSprint.name} (${activeSprint.task_count ?? "?"} tasks)`
+            : `- No active sprint`,
+        ];
+
+        return ok(lines.join("\n"));
       }),
   );
 }
