@@ -55,11 +55,12 @@ export function registerProjectTools(server: McpServer, client: ApiClient) {
     ({ project_id }) =>
       run(async () => {
         // Assemble summary from existing endpoints (no dedicated /summary route)
+        // tasks, sprints, members routes are NOT under /workspaces prefix
         const [project, tasks, sprints, members] = await Promise.all([
           client.get<any>(`${client.ws()}/projects/${project_id}`),
-          client.get<any>(`${client.ws()}/projects/${project_id}/tasks`, { limit: 500 }),
-          client.get<any>(`${client.ws()}/projects/${project_id}/sprints`),
-          client.get<any>(`${client.ws()}/projects/${project_id}/members`).catch(() => []),
+          client.get<any>(`/projects/${project_id}/tasks`, { limit: 500 }),
+          client.get<any>(`/projects/${project_id}/sprints`),
+          client.get<any>(`/projects/${project_id}/members`).catch(() => []),
         ]);
 
         const p = project.data || project;
