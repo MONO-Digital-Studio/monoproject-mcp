@@ -7,11 +7,13 @@ export function registerBugHubTools(server: McpServer, client: ApiClient) {
   server.registerTool(
     "mono_list_incidents",
     {
-      description: "List Bug Hub incidents with optional filters (source, severity, status)",
+      description: "List Bug Hub incidents with optional filters (source, severity, status, project, search)",
       inputSchema: z.object({
         source: z.string().optional().describe("Filter: sentry, grafana, manual"),
         severity: z.string().optional().describe("Filter: low, medium, high, critical"),
         status: z.string().optional().describe("Filter: new, investigating, task_created, resolved, dismissed"),
+        project_id: z.string().optional().describe("Filter by project UUID"),
+        search: z.string().optional().describe("Search in title/description"),
         page: z.number().optional(),
         per_page: z.number().optional(),
       }),
