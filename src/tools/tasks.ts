@@ -11,7 +11,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
         "List tasks in a project with optional filters. Returns paginated results.",
       inputSchema: z.object({
         project_id: z.string().describe("Project UUID"),
-        status: z.string().optional().describe("Filter: backlog, todo, in_progress, in_review, done, cancelled"),
+        status: z.string().optional().describe("Filter: backlog, todo, in_progress, in_review, blocked, done, cancelled, archived"),
         priority: z.string().optional().describe("Filter: none, low, medium, high, urgent"),
         type: z.string().optional().describe("Filter: epic, story, task, bug, sub_task"),
         assignee_id: z.string().optional().describe("Filter by assignee UUID"),
@@ -24,9 +24,19 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     },
     ({ project_id, status, priority, type, assignee_id, sprint_id, product_id, search, page, per_page }) =>
       run(async () => {
+        // Backend uses skip/limit (not page/per_page) and status_filter (not status)
+        const limit = per_page ?? 50;
+        const skip = ((page ?? 1) - 1) * limit;
         const data = await client.get<any>(`/projects/${project_id}/tasks`, {
-          status, priority, type, assignee_id, sprint_id, product_id,
-          search, page: page ?? 1, per_page: per_page ?? 50,
+          status_filter: status,
+          priority,
+          type,
+          assignee_id,
+          sprint_id,
+          product_id,
+          search,
+          skip,
+          limit,
         });
         const tasks = data.data || data;
         const total = data.total ?? tasks.length;
@@ -60,13 +70,13 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
         project_id: z.string().describe("Project UUID"),
         title: z.string().describe("Task title (1-500 chars)"),
         description: z.string().optional().describe("Task description (Markdown)"),
-        status: z.string().optional().describe("Status: backlog, todo, in_progress, in_review, done (default: backlog)"),
+        status: z.string().optional().describe("Status: backlog, todo, in_progress, in_review, blocked, done, cancelled (default: backlog)"),
         priority: z.string().optional().describe("Priority: none, low, medium, high, urgent (default: none)"),
         type: z.string().optional().describe("Type: epic, story, task, bug, sub_task (default: task)"),
         story_points: z.number().optional().describe("Story points (0-100)"),
         estimate_hours: z.number().optional().describe("Estimated hours"),
         due_date: z.string().optional().describe("Due date (ISO 8601)"),
-        labels: z.array(z.string()).optional().describe("Labels array"),
+        labels: z.array(z.string()).optional().describe("Labels from workspace registry. Standard: backend, frontend, database, infrastructure, api, mobile, security, performance, tech-debt, ux, a11y, seo, observability, needs-design, needs-discussion, billing, auth, websocket, integration, analytics, kb, audit, search. Do NOT invent new labels."),
         assignee_id: z.string().optional().describe("Assignee user UUID"),
         parent_id: z.string().optional().describe("Parent task UUID (for sub-tasks)"),
         product_id: z.string().optional().describe("Product UUID"),
@@ -97,7 +107,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
         estimate_hours: z.number().optional().describe("Estimated hours"),
         actual_hours: z.number().optional().describe("Actual hours spent"),
         due_date: z.string().optional().describe("Due date (ISO 8601)"),
-        labels: z.array(z.string()).optional().describe("Labels (replaces existing)"),
+        labels: z.array(z.string()).optional().describe("Labels from workspace registry (replaces existing). Use only standard labels, do NOT invent new ones."),
         assignee_id: z.string().optional().describe("Assignee UUID (empty string to unassign)"),
         sprint_id: z.string().optional().describe("Sprint UUID"),
         product_id: z.string().optional().describe("Product UUID"),
@@ -146,7 +156,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
           type: z.string().optional(),
           story_points: z.number().optional(),
           estimate_hours: z.number().optional(),
-          labels: z.array(z.string()).optional(),
+          labels: z.array(z.string()).optional().describe("Labels from workspace registry only"),
           assignee_id: z.string().optional(),
           product_id: z.string().optional(),
         })).describe("Array of tasks to create (max 50)"),
@@ -201,7 +211,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     },
     ({ project_id, task_ids }) =>
       run(async () => {
-        const data = await client.delete(`/projects/${project_id}/tasks/bulk`) as any;
+        const data = await client.delete(`/projects/${project_id}/tasks/bulk`, { task_ids }) as any;
         return ok(`Deleted ${data?.deleted || task_ids.length} tasks.`);
       }),
   );
