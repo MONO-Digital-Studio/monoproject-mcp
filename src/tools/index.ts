@@ -13,3 +13,4 @@ export { registerPmHubTools } from "./pm-hub.js";
 export { registerCustomFieldTools } from "./custom-fields.js";
 export { registerTaskTemplateTools } from "./task-templates.js";
 export { registerKnowledgeTools } from "./knowledge.js";
+export { registerCommitTools } from "./commits.js";

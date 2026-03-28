@@ -33,11 +33,17 @@ function _formatTaskHeader(t: any): string[] {
     `  ID: ${t.id}`,
     `  Priority: ${t.priority || "none"} | Type: ${t.type || "task"} | SP: ${t.story_points ?? "—"}`,
   ];
+  if (t.estimate_hours != null) parts.push(`  Estimate: ${t.estimate_hours}h`);
+  if (t.actual_hours != null) parts.push(`  Actual: ${t.actual_hours}h`);
   if (t.assignee_id) parts.push(`  Assignee: ${t.assignee_id}`);
+  if (t.creator_id) parts.push(`  Creator: ${t.creator_id}`);
+  if (t.parent_id) parts.push(`  Parent: ${t.parent_id}`);
   if (t.sprint_id) parts.push(`  Sprint: ${t.sprint_id}`);
   if (t.product_id) parts.push(`  Product: ${t.product_id}`);
   if (t.due_date) parts.push(`  Due: ${t.due_date}`);
   if (t.labels?.length) parts.push(`  Labels: ${t.labels.join(", ")}`);
+  if (t.created_at) parts.push(`  Created: ${t.created_at}`);
+  if (t.updated_at) parts.push(`  Updated: ${t.updated_at}`);
   return parts;
 }
 
@@ -192,6 +198,16 @@ export function formatList<T>(
     ? `${total} ${label} (showing ${items.length}):\n`
     : `${items.length} ${label}:\n`;
   return header + items.map((item, i) => `${i + 1}. ${formatter(item)}`).join("\n\n");
+}
+
+export function formatCommit(c: any): string {
+  const hash = c.hash ? c.hash.slice(0, 8) : "(no hash)";
+  const parts = [`\`${hash}\` ${c.message || ""}`];
+  if (c.author) parts.push(`Author: ${c.author}`);
+  if (c.repository) parts.push(`Repo: ${c.repository}`);
+  if (c.branch) parts.push(`Branch: ${c.branch}`);
+  if (c.committed_at) parts.push(`Date: ${c.committed_at}`);
+  return parts.join("\n  ");
 }
 
 /** Wrap tool result */

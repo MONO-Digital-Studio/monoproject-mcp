@@ -18,6 +18,7 @@ import {
   registerCustomFieldTools,
   registerTaskTemplateTools,
   registerKnowledgeTools,
+  registerCommitTools,
 } from "./tools/index.js";
 
 async function main() {
@@ -45,6 +46,7 @@ async function main() {
   registerCustomFieldTools(server, client);
   registerTaskTemplateTools(server, client);
   registerKnowledgeTools(server, client);
+  registerCommitTools(server, client);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
