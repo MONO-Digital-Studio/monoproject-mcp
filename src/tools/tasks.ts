@@ -17,7 +17,7 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
         assignee_id: z.string().optional().describe("Filter by assignee UUID"),
         sprint_id: z.string().optional().describe("Filter by sprint UUID"),
         product_id: z.string().optional().describe("Filter by product UUID"),
-        search: z.string().optional().describe("Search in title and description"),
+        search: z.string().optional().describe("Search in title, description, and identifier (e.g. 'LGZ-79')"),
         page: z.number().optional().describe("Page number (default 1)"),
         per_page: z.number().optional().describe("Items per page (default 50, max 100)"),
       }),
