@@ -24,11 +24,11 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
     },
     ({ project_id, status, priority, type, assignee_id, sprint_id, product_id, search, page, per_page }) =>
       run(async () => {
-        // Backend uses skip/limit (not page/per_page) and status_filter (not status)
+        // Backend uses skip/limit pagination and exposes filters under the public query aliases.
         const limit = per_page ?? 50;
         const skip = ((page ?? 1) - 1) * limit;
         const data = await client.get<any>(`/projects/${project_id}/tasks`, {
-          status_filter: status,
+          status,
           priority,
           type,
           assignee_id,
