@@ -28,7 +28,7 @@ export function registerTaskTemplateTools(server: McpServer, client: ApiClient) 
         project_id: z.string().describe("Project UUID"),
         name: z.string().describe("Template name (unique per project)"),
         description: z.string().optional().describe("Default task description"),
-        type: z.string().optional().describe("Default type: epic, story, task, bug, sub_task"),
+        type: z.enum(["epic", "story", "task", "bug"]).optional().describe("Default type: epic, story, task, bug"),
         priority: z.string().optional().describe("Default priority: none, low, medium, high, urgent"),
         story_points: z.number().optional().describe("Default story points"),
         estimate_hours: z.number().optional().describe("Default estimate hours"),
