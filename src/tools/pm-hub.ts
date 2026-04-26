@@ -163,9 +163,10 @@ export function registerPmHubTools(server: McpServer, client: ApiClient) {
     {
       description: "Create a product specification",
       inputSchema: z.object({
-        title: z.string().describe("Specification title"),
-        description: z.string().optional(),
+        title: z.string().describe("Specification title (1-500 chars)"),
+        content: z.string().describe("Specification content in Markdown (required, min 1 char)"),
         opportunity_id: z.string().optional().describe("Link to opportunity UUID"),
+        project_id: z.string().optional().describe("Link to project UUID"),
       }),
     },
     (body) =>
