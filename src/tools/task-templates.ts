@@ -23,18 +23,18 @@ export function registerTaskTemplateTools(server: McpServer, client: ApiClient) 
   server.registerTool(
     "mono_create_task_template",
     {
-      description: "Create a reusable task template with default values",
+      description: "Create reusable task template. All fields except name become defaults.",
       inputSchema: z.object({
         project_id: z.string().describe("Project UUID"),
-        name: z.string().describe("Template name (unique per project)"),
-        description: z.string().optional().describe("Default task description"),
-        type: z.enum(["epic", "story", "task", "bug"]).optional().describe("Default type: epic, story, task, bug"),
-        priority: z.string().optional().describe("Default priority: none, low, medium, high, urgent"),
-        story_points: z.number().optional().describe("Default story points"),
-        estimate_hours: z.number().optional().describe("Default estimate hours"),
-        labels: z.array(z.string()).optional().describe("Default labels"),
-        assignee_id: z.string().optional().describe("Default assignee UUID"),
-        product_id: z.string().optional().describe("Default product UUID"),
+        name: z.string().describe("Unique per project"),
+        description: z.string().optional(),
+        type: z.enum(["epic", "story", "task", "bug"]).optional(),
+        priority: z.string().optional().describe("none|low|medium|high|urgent"),
+        story_points: z.number().optional(),
+        estimate_hours: z.number().optional(),
+        labels: z.array(z.string()).optional(),
+        assignee_id: z.string().optional().describe("User UUID"),
+        product_id: z.string().optional().describe("Product UUID"),
       }),
     },
     ({ project_id, ...body }) =>
