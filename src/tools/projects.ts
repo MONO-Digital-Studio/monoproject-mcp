@@ -45,6 +45,49 @@ export function registerProjectTools(server: McpServer, client: ApiClient) {
   );
 
   server.registerTool(
+    "mono_update_project",
+    {
+      description:
+        "Patch project root entity (name, description, color, key, is_archived). Only provided fields change.",
+      inputSchema: z.object({
+        project_id: z.string().describe("Project UUID"),
+        name: z.string().optional().describe("Project name"),
+        description: z.string().optional().describe("Project description (markdown)"),
+        color: z.string().optional().describe("Hex color, e.g. #6366f1"),
+        key: z
+          .string()
+          .optional()
+          .describe("Short project key/slug used in task identifiers (e.g. CAD)"),
+        is_archived: z.boolean().optional().describe("Archive flag"),
+      }),
+    },
+    ({ project_id, ...patch }) =>
+      run(async () => {
+        const body: Record<string, unknown> = {};
+        for (const [k, v] of Object.entries(patch)) {
+          if (v !== undefined) body[k] = v;
+        }
+        if (Object.keys(body).length === 0) {
+          return ok("No fields to update.");
+        }
+        const data = await client.patch<any>(
+          `${client.ws()}/projects/${project_id}`,
+          body,
+        );
+        const p = data.data || data;
+        const lines = [
+          `Project updated: ${p.name} [${p.key}]`,
+          `ID: ${p.id}`,
+          `Color: ${p.color}`,
+          `Archived: ${p.is_archived}`,
+          p.description ? `Description: ${p.description}` : null,
+          `Updated: ${p.updated_at ?? p.created_at}`,
+        ].filter(Boolean);
+        return ok(lines.join("\n"));
+      }),
+  );
+
+  server.registerTool(
     "mono_get_project_summary",
     {
       description: "Get project summary with task statistics, team size, active sprint info",
