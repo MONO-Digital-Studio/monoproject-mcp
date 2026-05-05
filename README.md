@@ -4,7 +4,7 @@ MCP server for [MONOProject](https://monoproject.dev) — full API coverage for 
 
 ## Features
 
-**86 tools** across 17 modules:
+**87 tools** across 16 modules:
 
 | Module | Tools | Description |
 |--------|:-----:|-------------|
@@ -13,7 +13,7 @@ MCP server for [MONOProject](https://monoproject.dev) — full API coverage for 
 | **Sprints** | 9 | CRUD, start/complete, add/remove tasks |
 | **Cycles** | 11 | OKR cycles, key results, members, projects |
 | **Knowledge Base** | 6 | Docs CRUD, full-text search, tree structure |
-| **Projects** | 3 | List, details, summary with stats |
+| **Projects** | 4 | List, details, summary with stats, update |
 | **Products** | 4 | CRUD for product catalog |
 | **PM Hub** | 12 | Feedback, opportunities, specifications, AI spec generation |
 | **Bug Hub** | 8 | Incidents, Sentry sync, task creation from incidents |
@@ -23,7 +23,7 @@ MCP server for [MONOProject](https://monoproject.dev) — full API coverage for 
 | **Commits** | 2 | Link commits to tasks, list task commits |
 | **Custom Fields** | 5 | Define fields, get/set values on tasks |
 | **Task Templates** | 4 | CRUD, apply template to create tasks |
-| **Search** | 1 | Global search across workspace |
+| **Search** | 1 | Task search across workspace |
 
 ## Setup
 
@@ -45,7 +45,7 @@ Edit `.env`:
 |----------|-------------|
 | `MONO_API_URL` | API base URL (e.g. `https://monoproject.dev/api/v1`) |
 | `MONO_API_TOKEN` | Bearer token — create in MONOProject Settings → API Tokens |
-| `MONO_WORKSPACE_ID` | Workspace UUID |
+| `MONO_WORKSPACE_ID` | Workspace UUID or slug |
 
 ### 3. Build
 
@@ -88,10 +88,10 @@ npm run typecheck  # Type check without emit
 ```
 src/
 ├── index.ts       # Entry point — registers all tool groups
-├── client.ts      # HTTP client (auth, retries, error handling)
+├── client.ts      # HTTP client (auth, URL/query building, error handling)
 ├── config.ts      # Environment variables loader
 ├── format.ts      # Response formatters (API JSON → human-readable text)
-└── tools/         # 17 tool modules
+└── tools/         # 16 tool modules
     ├── index.ts   # Barrel exports
     ├── tasks.ts
     ├── comments.ts
@@ -121,9 +121,9 @@ src/
 
 ### Conventions
 
-- All API paths for project-scoped resources start with `/projects/{project_id}/`
+- Project-entity routes use `${client.ws()}/projects/...`; project-scoped task/sprint/comment resources use `/projects/{project_id}/...`
 - Import paths use `.js` extension (NodeNext module resolution)
-- Responses go through `format.ts` formatters — never raw JSON
+- Most responses go through `format.ts` formatters; some passthrough/debug endpoints intentionally return JSON text
 - Tool handlers use `run()` wrapper for error handling and `ok()` for responses
 
 ## Tech Stack
