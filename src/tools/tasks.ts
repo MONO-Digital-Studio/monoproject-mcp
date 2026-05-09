@@ -17,11 +17,13 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
         sprint_id: z.string().optional().describe("Sprint UUID"),
         product_id: z.string().optional().describe("Product UUID"),
         search: z.string().optional().describe("Match title/description/identifier (e.g. 'LGZ-79')"),
+        created_after: z.string().optional().describe("ISO 8601: only tasks created at or after this timestamp"),
+        created_before: z.string().optional().describe("ISO 8601: only tasks created strictly before this timestamp"),
         page: z.number().optional().describe("Default 1"),
         per_page: z.number().optional().describe("Default 50, max 100"),
       }),
     },
-    ({ project_id, status, priority, type, assignee_id, sprint_id, product_id, search, page, per_page }) =>
+    ({ project_id, status, priority, type, assignee_id, sprint_id, product_id, search, created_after, created_before, page, per_page }) =>
       run(async () => {
         // Backend uses skip/limit pagination and exposes filters under the public query aliases.
         const limit = per_page ?? 50;
@@ -34,6 +36,8 @@ export function registerTaskTools(server: McpServer, client: ApiClient) {
           sprint_id,
           product_id,
           search,
+          created_after,
+          created_before,
           skip,
           limit,
         });
