@@ -22,6 +22,7 @@ import {
   registerBulkOpsTools,
   registerSessionTools,
   registerPullRequestTools,
+  registerDeployTools,
 } from "./tools/index.js";
 
 async function main() {
@@ -53,6 +54,7 @@ async function main() {
   registerBulkOpsTools(server, client);
   registerSessionTools(server, client);
   registerPullRequestTools(server, client);
+  registerDeployTools(server, client);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
