@@ -16,3 +16,4 @@ export { registerKnowledgeTools } from "./knowledge.js";
 export { registerCommitTools } from "./commits.js";
 export { registerBulkOpsTools } from "./bulk-ops.js";
 export { registerSessionTools } from "./session.js";
+export { registerPullRequestTools } from "./pull-requests.js";
