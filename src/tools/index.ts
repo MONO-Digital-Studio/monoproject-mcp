@@ -18,3 +18,4 @@ export { registerBulkOpsTools } from "./bulk-ops.js";
 export { registerSessionTools } from "./session.js";
 export { registerPullRequestTools } from "./pull-requests.js";
 export { registerDeployTools } from "./deploys.js";
+export { registerDependencyTools } from "./dependencies.js";
