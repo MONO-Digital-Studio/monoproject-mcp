@@ -42,9 +42,19 @@ function _formatTaskHeader(t: any): string[] {
   if (t.product_id) parts.push(`  Product: ${t.product_id}`);
   if (t.due_date) parts.push(`  Due: ${t.due_date}`);
   if (t.labels?.length) parts.push(`  Labels: ${t.labels.join(", ")}`);
-  if (t.created_at) parts.push(`  Created: ${t.created_at}`);
-  if (t.updated_at) parts.push(`  Updated: ${t.updated_at}`);
+  if (t.created_at) parts.push(`  Created: ${formatShortDate(t.created_at)} (${t.created_at})`);
+  if (t.updated_at) parts.push(`  Updated: ${formatShortDate(t.updated_at)} (${t.updated_at})`);
   return parts;
+}
+
+/** Format ISO timestamp as DD.MM.YYYY for at-a-glance reading. */
+function formatShortDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  const dd = String(d.getUTCDate()).padStart(2, "0");
+  const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+  const yyyy = d.getUTCFullYear();
+  return `${dd}.${mm}.${yyyy}`;
 }
 
 export function formatTaskList(tasks: any[], total?: number): string {
