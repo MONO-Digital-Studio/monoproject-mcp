@@ -24,6 +24,7 @@ import {
   registerPullRequestTools,
   registerDeployTools,
   registerDependencyTools,
+  registerWorkflowTools,
 } from "./tools/index.js";
 
 async function main() {
@@ -57,6 +58,7 @@ async function main() {
   registerPullRequestTools(server, client);
   registerDeployTools(server, client);
   registerDependencyTools(server, client);
+  registerWorkflowTools(server, client);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
