@@ -20,6 +20,7 @@ import {
   registerKnowledgeTools,
   registerCommitTools,
   registerBulkOpsTools,
+  registerSessionTools,
 } from "./tools/index.js";
 
 async function main() {
@@ -49,6 +50,7 @@ async function main() {
   registerKnowledgeTools(server, client);
   registerCommitTools(server, client);
   registerBulkOpsTools(server, client);
+  registerSessionTools(server, client);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
