@@ -19,3 +19,4 @@ export { registerSessionTools } from "./session.js";
 export { registerPullRequestTools } from "./pull-requests.js";
 export { registerDeployTools } from "./deploys.js";
 export { registerDependencyTools } from "./dependencies.js";
+export { registerWorkflowTools } from "./workflow.js";
