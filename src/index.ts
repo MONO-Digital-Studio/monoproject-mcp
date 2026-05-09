@@ -19,6 +19,7 @@ import {
   registerTaskTemplateTools,
   registerKnowledgeTools,
   registerCommitTools,
+  registerBulkOpsTools,
 } from "./tools/index.js";
 
 async function main() {
@@ -47,6 +48,7 @@ async function main() {
   registerTaskTemplateTools(server, client);
   registerKnowledgeTools(server, client);
   registerCommitTools(server, client);
+  registerBulkOpsTools(server, client);
 
   const transport = new StdioServerTransport();
   await server.connect(transport);
