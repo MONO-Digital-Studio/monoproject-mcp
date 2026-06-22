@@ -154,4 +154,4 @@ src/
 
 ## License
 
-[MIT](LICENSE) © MONO Digital Studio
+[MIT](LICENSE) © MONO Studio, ООО «ИЦТ»
