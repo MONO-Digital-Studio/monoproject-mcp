@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "description": "MCP server for MONOProject — full API coverage for project management from Claude Code",
   "license": "MIT",
-  "author": "MONO Digital Studio",
+  "author": "MONO Studio (ООО «ИЦТ»)",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MONO-Digital-Studio/monoproject-mcp.git"
