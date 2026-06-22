@@ -42,8 +42,10 @@ function _formatTaskHeader(t: any): string[] {
   if (t.product_id) parts.push(`  Product: ${t.product_id}`);
   if (t.due_date) parts.push(`  Due: ${t.due_date}`);
   if (t.labels?.length) parts.push(`  Labels: ${t.labels.join(", ")}`);
-  if (t.created_at) parts.push(`  Created: ${formatShortDate(t.created_at)} (${t.created_at})`);
-  if (t.updated_at) parts.push(`  Updated: ${formatShortDate(t.updated_at)} (${t.updated_at})`);
+  if (t.created_at)
+    parts.push(`  Created: ${formatShortDate(t.created_at)} (${t.created_at})`);
+  if (t.updated_at)
+    parts.push(`  Updated: ${formatShortDate(t.updated_at)} (${t.updated_at})`);
   return parts;
 }
 
@@ -60,7 +62,9 @@ function formatShortDate(iso: string): string {
 export function formatTaskList(tasks: any[], total?: number): string {
   if (!tasks.length) return "No tasks found.";
   const header = total ? `Found ${total} tasks:\n` : `${tasks.length} tasks:\n`;
-  return header + tasks.map((t, i) => `${i + 1}. ${formatTask(t)}`).join("\n\n");
+  return (
+    header + tasks.map((t, i) => `${i + 1}. ${formatTask(t)}`).join("\n\n")
+  );
 }
 
 export function formatComment(c: any): string {
@@ -71,15 +75,14 @@ export function formatComment(c: any): string {
 
 export function formatCommentList(comments: any[]): string {
   if (!comments.length) return "No comments.";
-  return `${comments.length} comments:\n\n` +
-    comments.map((c, i) => `${i + 1}. ${formatComment(c)}`).join("\n\n---\n\n");
+  return (
+    `${comments.length} comments:\n\n` +
+    comments.map((c, i) => `${i + 1}. ${formatComment(c)}`).join("\n\n---\n\n")
+  );
 }
 
 export function formatSprint(s: any): string {
-  const parts = [
-    `${s.name} [${s.status}]`,
-    `  ID: ${s.id}`,
-  ];
+  const parts = [`${s.name} [${s.status}]`, `  ID: ${s.id}`];
   if (s.goal) parts.push(`  Goal: ${s.goal}`);
   if (s.start_date) parts.push(`  Start: ${s.start_date}`);
   if (s.end_date) parts.push(`  End: ${s.end_date}`);
@@ -97,7 +100,8 @@ export function formatCycle(c: any): string {
   if (c.goal) parts.push(`  Goal: ${c.goal}`);
   if (c.start_date) parts.push(`  Start: ${c.start_date}`);
   if (c.end_date) parts.push(`  End: ${c.end_date}`);
-  if (c.project_count !== undefined) parts.push(`  Projects: ${c.project_count}`);
+  if (c.project_count !== undefined)
+    parts.push(`  Projects: ${c.project_count}`);
   if (c.task_count !== undefined) parts.push(`  Tasks: ${c.task_count}`);
   if (c.member_count !== undefined) parts.push(`  Members: ${c.member_count}`);
   if (c.kr_count !== undefined) parts.push(`  Key Results: ${c.kr_count}`);
@@ -131,6 +135,13 @@ export function formatProduct(p: any): string {
   return parts.join("\n");
 }
 
+export function formatLabel(l: any): string {
+  const head = `${l.name}${l.group ? ` [${l.group}]` : ""}${l.color ? ` ${l.color}` : ""}`;
+  const parts = [head, `  ID: ${l.id}`];
+  if (l.description) parts.push(`  ${l.description}`);
+  return parts.join("\n");
+}
+
 export function formatKeyResult(kr: any): string {
   return `${kr.title} [${kr.status}] — ${kr.current_value}/${kr.target_value} ${kr.unit || ""} (${kr.progress_pct ?? 0}%)`;
 }
@@ -139,29 +150,27 @@ export function formatFeedback(fb: any): string {
   const parts = [`${fb.title || fb.id} [${fb.sentiment || "neutral"}]`];
   if (fb.source) parts.push(`  Source: ${fb.source}`);
   if (fb.content) {
-    const c = fb.content.length > 150 ? fb.content.slice(0, 150) + "..." : fb.content;
+    const c =
+      fb.content.length > 150 ? fb.content.slice(0, 150) + "..." : fb.content;
     parts.push(`  ${c}`);
   }
   return parts.join("\n");
 }
 
 export function formatOpportunity(opp: any): string {
-  const parts = [
-    `${opp.title} [${opp.status}]`,
-    `  ID: ${opp.id}`,
-  ];
+  const parts = [`${opp.title} [${opp.status}]`, `  ID: ${opp.id}`];
   if (opp.category) parts.push(`  Category: ${opp.category}`);
   if (opp.score !== undefined) parts.push(`  Score: ${opp.score}`);
   return parts.join("\n");
 }
 
 export function formatSpecification(spec: any): string {
-  const parts = [
-    `${spec.title} [${spec.status}]`,
-    `  ID: ${spec.id}`,
-  ];
+  const parts = [`${spec.title} [${spec.status}]`, `  ID: ${spec.id}`];
   if (spec.description) {
-    const d = spec.description.length > 150 ? spec.description.slice(0, 150) + "..." : spec.description;
+    const d =
+      spec.description.length > 150
+        ? spec.description.slice(0, 150) + "..."
+        : spec.description;
     parts.push(`  ${d}`);
   }
   return parts.join("\n");
@@ -203,11 +212,15 @@ export function formatList<T>(
   label = "items",
   total?: number,
 ): string {
-  if (!items || !Array.isArray(items) || !items.length) return `No ${label} found.`;
-  const header = total !== undefined
-    ? `${total} ${label} (showing ${items.length}):\n`
-    : `${items.length} ${label}:\n`;
-  return header + items.map((item, i) => `${i + 1}. ${formatter(item)}`).join("\n\n");
+  if (!items || !Array.isArray(items) || !items.length)
+    return `No ${label} found.`;
+  const header =
+    total !== undefined
+      ? `${total} ${label} (showing ${items.length}):\n`
+      : `${items.length} ${label}:\n`;
+  return (
+    header + items.map((item, i) => `${i + 1}. ${formatter(item)}`).join("\n\n")
+  );
 }
 
 export function formatCommit(c: any): string {
@@ -226,7 +239,10 @@ export function ok(text: string) {
 }
 
 export function err(message: string) {
-  return { content: [{ type: "text" as const, text: `Error: ${message}` }], isError: true as const };
+  return {
+    content: [{ type: "text" as const, text: `Error: ${message}` }],
+    isError: true as const,
+  };
 }
 
 /** Safe tool execution wrapper */
