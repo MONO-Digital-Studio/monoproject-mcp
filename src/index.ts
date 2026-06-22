@@ -9,6 +9,7 @@ import {
   registerSprintTools,
   registerCycleTools,
   registerProductTools,
+  registerLabelTools,
   registerUserTools,
   registerSearchTools,
   registerActivityTools,
@@ -43,6 +44,7 @@ async function main() {
   registerSprintTools(server, client);
   registerCycleTools(server, client);
   registerProductTools(server, client);
+  registerLabelTools(server, client);
   registerUserTools(server, client);
   registerSearchTools(server, client);
   registerActivityTools(server, client);

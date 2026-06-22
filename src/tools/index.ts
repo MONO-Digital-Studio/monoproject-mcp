@@ -4,6 +4,7 @@ export { registerCommentTools } from "./comments.js";
 export { registerSprintTools } from "./sprints.js";
 export { registerCycleTools } from "./cycles.js";
 export { registerProductTools } from "./products.js";
+export { registerLabelTools } from "./labels.js";
 export { registerUserTools } from "./users.js";
 export { registerSearchTools } from "./search.js";
 export { registerActivityTools } from "./activities.js";
