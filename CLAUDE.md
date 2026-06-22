@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-MCP server for MONOProject — provides 50+ tools for project management (tasks, sprints, docs, comments, billing, integrations) via Model Context Protocol.
+MCP server for MONOProject — provides 100 tools for project management (tasks, sprints, docs, comments, billing, integrations) via Model Context Protocol.
 
 ## Commands
 
@@ -20,7 +20,7 @@ npm run typecheck  # Type check without emit
 - `src/client.ts` — HTTP client (auth, error handling, response parsing)
 - `src/config.ts` — env vars: MONO_API_URL, MONO_API_TOKEN, MONO_WORKSPACE_ID
 - `src/format.ts` — response formatters (convert API JSON → human-readable text)
-- `src/tools/` — 17 tool modules, each exports a `register*Tools(server, client)` function
+- `src/tools/` — 23 tool modules, each exports a `register*Tools(server, client)` function
 
 ## Critical Rules
 

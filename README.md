@@ -4,26 +4,33 @@ MCP server for [MONOProject](https://monoproject.dev) — full API coverage for 
 
 ## Features
 
-**87 tools** across 16 modules:
+**100 tools** across 23 modules:
 
-| Module | Tools | Description |
-|--------|:-----:|-------------|
-| **Tasks** | 8 | CRUD, bulk operations, search, filters |
-| **Comments** | 4 | List, add, update, delete (threaded replies, @mentions) |
-| **Sprints** | 9 | CRUD, start/complete, add/remove tasks |
-| **Cycles** | 11 | OKR cycles, key results, members, projects |
-| **Knowledge Base** | 6 | Docs CRUD, full-text search, tree structure |
-| **Projects** | 4 | List, details, summary with stats, update |
-| **Products** | 4 | CRUD for product catalog |
-| **PM Hub** | 12 | Feedback, opportunities, specifications, AI spec generation |
-| **Bug Hub** | 8 | Incidents, Sentry sync, task creation from incidents |
-| **Users** | 4 | List, find, resolve, sync |
-| **Activities** | 2 | Workspace and task activity feeds |
-| **Notifications** | 3 | List, mark read, mark all read |
-| **Commits** | 2 | Link commits to tasks, list task commits |
-| **Custom Fields** | 5 | Define fields, get/set values on tasks |
-| **Task Templates** | 4 | CRUD, apply template to create tasks |
-| **Search** | 1 | Task search across workspace |
+| Module             | Tools | Description                                                 |
+| ------------------ | :---: | ----------------------------------------------------------- |
+| **Tasks**          |   8   | CRUD, bulk operations, search, filters                      |
+| **Comments**       |   4   | List, add, update, delete (threaded replies, @mentions)     |
+| **Sprints**        |   9   | CRUD, start/complete, add/remove tasks                      |
+| **Cycles**         |  11   | OKR cycles, key results, members, projects                  |
+| **Knowledge Base** |   6   | Docs CRUD, full-text search, tree structure                 |
+| **Projects**       |   4   | List, details, summary with stats, update                   |
+| **Products**       |   4   | CRUD for product catalog                                    |
+| **PM Hub**         |  12   | Feedback, opportunities, specifications, AI spec generation |
+| **Bug Hub**        |   8   | Incidents, Sentry sync, task creation from incidents        |
+| **Users**          |   4   | List, find, resolve, sync                                   |
+| **Activities**     |   2   | Workspace and task activity feeds                           |
+| **Notifications**  |   3   | List, mark read, mark all read                              |
+| **Commits**        |   2   | Link commits to tasks, list task commits                    |
+| **Custom Fields**  |   5   | Define fields, get/set values on tasks                      |
+| **Task Templates** |   4   | CRUD, apply template to create tasks                        |
+| **Search**         |   1   | Task search across workspace                                |
+| **Labels**         |   3   | List, create, bulk-create the workspace label registry      |
+| **Dependencies**   |   3   | Link / unlink task dependencies (blocks / relates)          |
+| **Pull Requests**  |   2   | Link and list task pull requests                            |
+| **Deploys**        |   2   | List task deploys, log a deploy                             |
+| **Workflow**       |   1   | Advance task status with workflow guards                    |
+| **Session**        |   1   | Session bootstrap aggregator                                |
+| **Bulk Ops**       |   1   | Bulk-close sprint in-review tasks                           |
 
 ## Setup
 
@@ -41,11 +48,13 @@ cp .env.example .env
 
 Edit `.env`:
 
-| Variable | Description |
-|----------|-------------|
-| `MONO_API_URL` | API base URL (e.g. `https://monoproject.dev/api/v1`) |
-| `MONO_API_TOKEN` | Bearer token — create in MONOProject Settings → API Tokens |
-| `MONO_WORKSPACE_ID` | Workspace UUID or slug |
+| Variable            | Description                                                |
+| ------------------- | ---------------------------------------------------------- |
+| `MONO_API_URL`      | API base URL (e.g. `https://monoproject.dev/api/v1`)       |
+| `MONO_API_TOKEN`    | Bearer token — create in MONOProject Settings → API Tokens |
+| `MONO_WORKSPACE_ID` | Workspace UUID or slug                                     |
+
+> **Token & subscription.** The API token is created in your **paid** workspace (Settings → API Tokens) and is bound to your subscription/plan — the server does nothing without a valid token. **Never commit `.env`** (it is gitignored); revoke a leaked token in Settings → API Tokens.
 
 ### 3. Build
 
@@ -55,12 +64,22 @@ npm run build
 
 ### 4. Add to Claude Code
 
-Add to `~/.claude/settings.json`:
+Via CLI (recommended):
+
+```bash
+claude mcp add monoproject \
+  -e MONO_API_URL=https://monoproject.dev/api/v1 \
+  -e MONO_API_TOKEN=mono_your_token \
+  -e MONO_WORKSPACE_ID=your-workspace-id \
+  -- node /path/to/monoproject-mcp/dist/index.js
+```
+
+Or add to `~/.claude.json` (a project-level `.mcp.json` works too):
 
 ```json
 {
   "mcpServers": {
-    "monoproject-mcp": {
+    "monoproject": {
       "command": "node",
       "args": ["/path/to/monoproject-mcp/dist/index.js"],
       "env": {
@@ -135,4 +154,4 @@ src/
 
 ## License
 
-Private — MONO Studio internal tool.
+[MIT](LICENSE) © MONO Digital Studio
