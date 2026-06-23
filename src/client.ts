@@ -20,10 +20,36 @@ export class ApiClient {
   private token: string;
   public workspaceId: string;
 
+  /** Max retry attempts for transient failures (total tries = MAX_RETRIES + 1). */
+  private static readonly MAX_RETRIES = 3;
+  /** Status codes worth retrying: rate-limit + transient server errors. */
+  private static readonly RETRYABLE_STATUS = new Set([429, 500, 502, 503, 504]);
+
   constructor(config: Config) {
     this.baseUrl = config.apiUrl;
     this.token = config.apiToken;
     this.workspaceId = config.workspaceId;
+  }
+
+  private sleep(ms: number): Promise<void> {
+    return new Promise((resolve) => setTimeout(resolve, ms));
+  }
+
+  /**
+   * Delay before the next retry. Honours the server's ``X-RateLimit-Reset``
+   * hint on 429 (an epoch-seconds timestamp set by the API); otherwise falls
+   * back to exponential backoff with full jitter (base 500ms, cap 8s).
+   */
+  private retryDelayMs(attempt: number, res?: Response): number {
+    const reset = res?.headers.get("X-RateLimit-Reset");
+    if (reset) {
+      const deltaMs = Number(reset) * 1000 - Date.now();
+      if (Number.isFinite(deltaMs) && deltaMs > 0) {
+        return Math.min(deltaMs + 100, 30_000);
+      }
+    }
+    const ceil = Math.min(500 * 2 ** attempt, 8_000);
+    return Math.floor(ceil * (0.5 + Math.random() * 0.5));
   }
 
   private headers(): Record<string, string> {
@@ -58,29 +84,49 @@ export class ApiClient {
     },
   ): Promise<T> {
     const url = this.buildUrl(path, options?.params);
-    const res = await fetch(url, {
-      method,
-      headers: this.headers(),
-      body: options?.body ? JSON.stringify(options.body) : undefined,
-    });
+    const body = options?.body ? JSON.stringify(options.body) : undefined;
 
-    if (!res.ok) {
-      let detail: string;
+    for (let attempt = 0; ; attempt++) {
+      let res: Response;
       try {
-        const body = await res.json();
-        detail =
-          body.detail ||
-          body.message ||
-          (typeof body === "string" ? body : JSON.stringify(body));
-      } catch {
-        detail = res.statusText;
+        res = await fetch(url, { method, headers: this.headers(), body });
+      } catch (err) {
+        // Network/transport error (DNS, dropped connection, timeout) — retry.
+        if (attempt < ApiClient.MAX_RETRIES) {
+          await this.sleep(this.retryDelayMs(attempt));
+          continue;
+        }
+        const message = err instanceof Error ? err.message : String(err);
+        throw new ApiError(0, `Network error after retries: ${message}`);
       }
-      throw new ApiError(res.status, detail);
+
+      if (!res.ok) {
+        // Retry transient failures (429 rate-limit, 5xx) with backoff; the
+        // MCP agent's burst then degrades gracefully instead of failing a tool.
+        if (
+          ApiClient.RETRYABLE_STATUS.has(res.status) &&
+          attempt < ApiClient.MAX_RETRIES
+        ) {
+          await this.sleep(this.retryDelayMs(attempt, res));
+          continue;
+        }
+        let detail: string;
+        try {
+          const errBody = await res.json();
+          detail =
+            errBody.detail ||
+            errBody.message ||
+            (typeof errBody === "string" ? errBody : JSON.stringify(errBody));
+        } catch {
+          detail = res.statusText;
+        }
+        throw new ApiError(res.status, detail);
+      }
+
+      if (res.status === 204) return undefined as T;
+
+      return (await res.json()) as T;
     }
-
-    if (res.status === 204) return undefined as T;
-
-    return (await res.json()) as T;
   }
 
   async get<T>(
