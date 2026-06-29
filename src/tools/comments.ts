@@ -16,7 +16,7 @@ export function registerCommentTools(server: McpServer, client: ApiClient) {
     ({ project_id, task_id }) =>
       run(async () => {
         const data = await client.get<any>(`/projects/${project_id}/tasks/${task_id}/comments`);
-        const comments = Array.isArray(data) ? data : (data.data || []);
+        const comments = data.items || data.data || (Array.isArray(data) ? data : []);
         return ok(formatCommentList(comments));
       }),
   );
