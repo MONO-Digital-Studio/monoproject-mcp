@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-MCP server for MONOProject — provides 101 tools for project management (tasks, sprints, docs, comments, billing, integrations) via Model Context Protocol.
+MCP server for MONOProject — provides 103 tools for project management (tasks, sprints, docs, comments, billing, integrations) via Model Context Protocol.
 
 ## Commands
 
@@ -30,6 +30,22 @@ All project-scoped resources require `/projects/{project_id}/` prefix. Example:
 
 - Correct: `/projects/${project_id}/tasks/${task_id}/comments`
 - Wrong: `/tasks/${task_id}/comments` (→ 404)
+
+### Link/unlink subresources take the resource id as a PATH param
+
+Cycle and sprint link/unlink endpoints expect the linked resource id in the
+URL path with an **empty body**:
+
+- `POST/DELETE /workspaces/{ws}/cycles/{id}/projects/{project_id}`
+- `POST/DELETE /workspaces/{ws}/cycles/{id}/tasks/{task_id}`
+- `POST/DELETE /projects/{pid}/sprints/{sid}/tasks/{task_id}`
+- `DELETE /tasks/{task_id}/dependencies/{dep_id}`
+
+Exception (body-style): `POST /cycles/{id}/members` takes `{user_id, role}` in
+the JSON body. Sending a path-param resource in the body hits a non-existent
+route and returns **404** for any cycle status (MPJ-309). When adding a new
+link tool, verify the actual route signature in `apps/api/app/api/v1/` of the
+backend repo first.
 
 ### Always rebuild after changes
 

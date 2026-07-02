@@ -173,9 +173,24 @@ export function registerCycleTools(server: McpServer, client: ApiClient) {
     },
     ({ cycle_id, project_id }) =>
       run(async () => {
-        const data = await client.post<any>(`${client.ws()}/cycles/${cycle_id}/projects/${project_id}`);
-        const p = data.data || data;
-        return ok(`Project ${p.project_name || project_id} added to cycle.`);
+        await client.post(`${client.ws()}/cycles/${cycle_id}/projects/${project_id}`);
+        return ok(`Project ${project_id} added to cycle.`);
+      }),
+  );
+
+  server.registerTool(
+    "mono_remove_project_from_cycle",
+    {
+      description: "Unlink a project from a cycle",
+      inputSchema: z.object({
+        cycle_id: z.string().describe("Cycle UUID"),
+        project_id: z.string().describe("Project UUID to unlink"),
+      }),
+    },
+    ({ cycle_id, project_id }) =>
+      run(async () => {
+        await client.delete(`${client.ws()}/cycles/${cycle_id}/projects/${project_id}`);
+        return ok(`Project ${project_id} removed from cycle.`);
       }),
   );
 
@@ -190,9 +205,24 @@ export function registerCycleTools(server: McpServer, client: ApiClient) {
     },
     ({ cycle_id, task_id }) =>
       run(async () => {
-        const data = await client.post<any>(`${client.ws()}/cycles/${cycle_id}/tasks/${task_id}`);
-        const t = data.data || data;
-        return ok(`Task ${t.task_identifier || task_id} linked to cycle.`);
+        await client.post(`${client.ws()}/cycles/${cycle_id}/tasks/${task_id}`);
+        return ok(`Task ${task_id} linked to cycle.`);
+      }),
+  );
+
+  server.registerTool(
+    "mono_remove_task_from_cycle",
+    {
+      description: "Unlink a task from a cycle",
+      inputSchema: z.object({
+        cycle_id: z.string().describe("Cycle UUID"),
+        task_id: z.string().describe("Task UUID to unlink"),
+      }),
+    },
+    ({ cycle_id, task_id }) =>
+      run(async () => {
+        await client.delete(`${client.ws()}/cycles/${cycle_id}/tasks/${task_id}`);
+        return ok(`Task ${task_id} removed from cycle.`);
       }),
   );
 
