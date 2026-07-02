@@ -173,8 +173,56 @@ export function registerCycleTools(server: McpServer, client: ApiClient) {
     },
     ({ cycle_id, project_id }) =>
       run(async () => {
-        await client.post(`${client.ws()}/cycles/${cycle_id}/projects`, { project_id });
+        await client.post(`${client.ws()}/cycles/${cycle_id}/projects/${project_id}`);
         return ok(`Project ${project_id} added to cycle.`);
+      }),
+  );
+
+  server.registerTool(
+    "mono_remove_project_from_cycle",
+    {
+      description: "Unlink a project from a cycle",
+      inputSchema: z.object({
+        cycle_id: z.string().describe("Cycle UUID"),
+        project_id: z.string().describe("Project UUID to unlink"),
+      }),
+    },
+    ({ cycle_id, project_id }) =>
+      run(async () => {
+        await client.delete(`${client.ws()}/cycles/${cycle_id}/projects/${project_id}`);
+        return ok(`Project ${project_id} removed from cycle.`);
+      }),
+  );
+
+  server.registerTool(
+    "mono_add_task_to_cycle",
+    {
+      description: "Link a task to a cycle. The task must belong to a project linked to the cycle.",
+      inputSchema: z.object({
+        cycle_id: z.string().describe("Cycle UUID"),
+        task_id: z.string().describe("Task UUID to link"),
+      }),
+    },
+    ({ cycle_id, task_id }) =>
+      run(async () => {
+        await client.post(`${client.ws()}/cycles/${cycle_id}/tasks/${task_id}`);
+        return ok(`Task ${task_id} linked to cycle.`);
+      }),
+  );
+
+  server.registerTool(
+    "mono_remove_task_from_cycle",
+    {
+      description: "Unlink a task from a cycle",
+      inputSchema: z.object({
+        cycle_id: z.string().describe("Cycle UUID"),
+        task_id: z.string().describe("Task UUID to unlink"),
+      }),
+    },
+    ({ cycle_id, task_id }) =>
+      run(async () => {
+        await client.delete(`${client.ws()}/cycles/${cycle_id}/tasks/${task_id}`);
+        return ok(`Task ${task_id} removed from cycle.`);
       }),
   );
 
