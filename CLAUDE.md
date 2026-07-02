@@ -4,7 +4,7 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 ## Overview
 
-MCP server for MONOProject — provides 100 tools for project management (tasks, sprints, docs, comments, billing, integrations) via Model Context Protocol.
+MCP server for MONOProject — provides 101 tools for project management (tasks, sprints, docs, comments, billing, integrations) via Model Context Protocol.
 
 ## Commands
 

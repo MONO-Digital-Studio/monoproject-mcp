@@ -173,8 +173,26 @@ export function registerCycleTools(server: McpServer, client: ApiClient) {
     },
     ({ cycle_id, project_id }) =>
       run(async () => {
-        await client.post(`${client.ws()}/cycles/${cycle_id}/projects`, { project_id });
-        return ok(`Project ${project_id} added to cycle.`);
+        const data = await client.post<any>(`${client.ws()}/cycles/${cycle_id}/projects/${project_id}`);
+        const p = data.data || data;
+        return ok(`Project ${p.project_name || project_id} added to cycle.`);
+      }),
+  );
+
+  server.registerTool(
+    "mono_add_task_to_cycle",
+    {
+      description: "Link a task to a cycle. The task must belong to a project linked to the cycle.",
+      inputSchema: z.object({
+        cycle_id: z.string().describe("Cycle UUID"),
+        task_id: z.string().describe("Task UUID to link"),
+      }),
+    },
+    ({ cycle_id, task_id }) =>
+      run(async () => {
+        const data = await client.post<any>(`${client.ws()}/cycles/${cycle_id}/tasks/${task_id}`);
+        const t = data.data || data;
+        return ok(`Task ${t.task_identifier || task_id} linked to cycle.`);
       }),
   );
 

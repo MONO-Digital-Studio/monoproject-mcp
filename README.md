@@ -4,14 +4,14 @@ MCP server for [MONOProject](https://monoproject.dev) — full API coverage for 
 
 ## Features
 
-**100 tools** across 23 modules:
+**101 tools** across 23 modules:
 
 | Module             | Tools | Description                                                 |
 | ------------------ | :---: | ----------------------------------------------------------- |
 | **Tasks**          |   8   | CRUD, bulk operations, search, filters                      |
 | **Comments**       |   4   | List, add, update, delete (threaded replies, @mentions)     |
 | **Sprints**        |   9   | CRUD, start/complete, add/remove tasks                      |
-| **Cycles**         |  11   | OKR cycles, key results, members, projects                  |
+| **Cycles**         |  12   | OKR cycles, key results, members, projects, tasks            |
 | **Knowledge Base** |   6   | Docs CRUD, full-text search, tree structure                 |
 | **Projects**       |   4   | List, details, summary with stats, update                   |
 | **Products**       |   4   | CRUD for product catalog                                    |
