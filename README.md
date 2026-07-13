@@ -32,21 +32,12 @@ MCP server for [MONOProject](https://monoproject.dev) — full API coverage for 
 | **Session**        |   1   | Session bootstrap aggregator                                |
 | **Bulk Ops**       |   1   | Bulk-close sprint in-review tasks                           |
 
-## Setup
+## Quick Start
 
-### 1. Install dependencies
+No clone, no build — the package is published to npm as
+[`monoproject-mcp`](https://www.npmjs.com/package/monoproject-mcp).
 
-```bash
-npm install
-```
-
-### 2. Configure environment
-
-```bash
-cp .env.example .env
-```
-
-Edit `.env`:
+### Environment
 
 | Variable            | Description                                                |
 | ------------------- | ---------------------------------------------------------- |
@@ -54,15 +45,9 @@ Edit `.env`:
 | `MONO_API_TOKEN`    | Bearer token — create in MONOProject Settings → API Tokens |
 | `MONO_WORKSPACE_ID` | Workspace UUID or slug                                     |
 
-> **Token & subscription.** The API token is created in your **paid** workspace (Settings → API Tokens) and is bound to your subscription/plan — the server does nothing without a valid token. **Never commit `.env`** (it is gitignored); revoke a leaked token in Settings → API Tokens.
+> **Token & subscription.** The API token is created in your workspace (Settings → API Tokens) and is bound to your subscription/plan — the server does nothing without a valid token. Revoke a leaked token in Settings → API Tokens.
 
-### 3. Build
-
-```bash
-npm run build
-```
-
-### 4. Add to Claude Code
+### Add to Claude Code
 
 Via CLI (recommended):
 
@@ -71,7 +56,7 @@ claude mcp add monoproject \
   -e MONO_API_URL=https://monoproject.dev/api/v1 \
   -e MONO_API_TOKEN=mono_your_token \
   -e MONO_WORKSPACE_ID=your-workspace-id \
-  -- node /path/to/monoproject-mcp/dist/index.js
+  -- npx -y monoproject-mcp
 ```
 
 Or add to `~/.claude.json` (a project-level `.mcp.json` works too):
@@ -80,8 +65,8 @@ Or add to `~/.claude.json` (a project-level `.mcp.json` works too):
 {
   "mcpServers": {
     "monoproject": {
-      "command": "node",
-      "args": ["/path/to/monoproject-mcp/dist/index.js"],
+      "command": "npx",
+      "args": ["-y", "monoproject-mcp"],
       "env": {
         "MONO_API_URL": "https://monoproject.dev/api/v1",
         "MONO_API_TOKEN": "mono_your_token",
@@ -94,13 +79,29 @@ Or add to `~/.claude.json` (a project-level `.mcp.json` works too):
 
 Restart Claude Code to load the server.
 
-## Development
+Global install works too: `npm install -g monoproject-mcp`, then use
+`"command": "monoproject-mcp"` instead of `npx`.
+
+## Development (from source)
 
 ```bash
-npm run dev        # Run with tsx (hot reload)
-npm run build      # Compile TypeScript → dist/
-npm run typecheck  # Type check without emit
+git clone https://github.com/MONO-Digital-Studio/monoproject-mcp.git
+cd monoproject-mcp
+npm install            # prepare-хук соберёт dist/
+cp .env.example .env   # заполнить MONO_* (никогда не коммитить)
+npm run dev            # Run with tsx (hot reload)
+npm run build          # Compile TypeScript → dist/
+npm run typecheck      # Type check without emit
 ```
+
+Installing straight from GitHub also works (the `prepare` hook builds `dist/`):
+`npm install -g github:MONO-Digital-Studio/monoproject-mcp`.
+
+### Releasing (maintainers)
+
+Bump `version` in `package.json` → merge → create a GitHub Release with tag
+`vX.Y.Z` — the `Release (npm publish)` workflow publishes to npm with
+`--provenance` (requires the `NPM_TOKEN` repo secret).
 
 ## Architecture
 
