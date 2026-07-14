@@ -1,0 +1,49 @@
+# npm publish с provenance (MPJ-286).
+#
+# Триггер: публикация GitHub Release (тег vX.Y.Z) или ручной запуск.
+# Требования:
+#   - секрет NPM_TOKEN (granular access token с publish-правом на пакет
+#     monoproject-mcp) в Settings → Secrets → Actions;
+#   - версия в package.json == тегу релиза (проверяется шагом ниже).
+# provenance подписывает пакет через GitHub OIDC (id-token: write) —
+# на npmjs.com появляется бейдж происхождения сборки.
+
+name: Release (npm publish)
+
+on:
+  release:
+    types: [published]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write # OIDC для npm --provenance
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+          registry-url: "https://registry.npmjs.org"
+      - name: Verify tag matches package.json version
+        if: github.event_name == 'release'
+        env:
+          TAG: ${{ github.event.release.tag_name }}
+        run: |
+          PKG_VERSION=$(node -p "require('./package.json').version")
+          if [ "v${PKG_VERSION}" != "${TAG}" ]; then
+            echo "::error::package.json version v${PKG_VERSION} != release tag ${TAG}"
+            exit 1
+          fi
+      - run: npm ci
+      - run: npm run typecheck
+      # build выполнит prepublishOnly внутри npm publish, но гоняем явно,
+      # чтобы падение сборки было отдельным шагом, а не внутри publish.
+      - run: npm run build
+      - name: Publish to npm (provenance)
+        run: npm publish --provenance
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

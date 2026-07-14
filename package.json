@@ -1,9 +1,17 @@
 {
   "name": "monoproject-mcp",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "MCP server for MONOProject — full API coverage for project management from Claude Code",
   "license": "MIT",
-  "author": "MONO Studio (ООО «ИЦТ»)",
+  "author": "MONO Studio",
+  "keywords": [
+    "mcp",
+    "model-context-protocol",
+    "mcp-server",
+    "project-management",
+    "claude",
+    "monoproject"
+  ],
   "repository": {
     "type": "git",
     "url": "git+https://github.com/MONO-Digital-Studio/monoproject-mcp.git"
@@ -15,11 +23,19 @@
   "bin": {
     "monoproject-mcp": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
     "build": "tsc",
     "dev": "tsx src/index.ts",
     "start": "node dist/index.js",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "prepare": "npm run build",
+    "prepublishOnly": "npm run typecheck && npm run build"
   },
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.12.0",
