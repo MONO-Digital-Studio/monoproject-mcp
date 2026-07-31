@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { ApiClient } from "../client.js";
 import { ok, run } from "../format.js";
@@ -79,7 +79,10 @@ export function registerKnowledgeTools(server: McpServer, client: ApiClient) {
         type: z.enum(["document", "folder"]).default("document").describe("Type: document or folder"),
         parent_id: z.string().optional().describe("Parent folder UUID (null = root)"),
         content: z.string().optional().describe("Markdown content (documents only)"),
-        frontmatter: z.record(z.any()).optional().describe("Metadata: {tags: [], status: 'draft'}"),
+        frontmatter: z
+          .record(z.string(), z.any())
+          .optional()
+          .describe("Metadata: {tags: [], status: 'draft'}"),
       }),
     },
     (body) =>
@@ -107,7 +110,7 @@ export function registerKnowledgeTools(server: McpServer, client: ApiClient) {
         document_id: z.string().describe("Document UUID"),
         title: z.string().optional().describe("New title"),
         content: z.string().optional().describe("New markdown content"),
-        frontmatter: z.record(z.any()).optional().describe("New metadata"),
+        frontmatter: z.record(z.string(), z.any()).optional().describe("New metadata"),
       }),
     },
     ({ project_id, document_id, ...body }) =>

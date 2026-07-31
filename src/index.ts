@@ -1,6 +1,6 @@
 #!/usr/bin/env node
-import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
-import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { serveStdio } from "@modelcontextprotocol/server/stdio";
+import { McpServer } from "@modelcontextprotocol/server";
 import { loadConfig } from "./config.js";
 import { ApiClient } from "./client.js";
 import {
@@ -29,10 +29,14 @@ import {
   registerWorkflowTools,
 } from "./tools/index.js";
 
-async function main() {
-  const config = loadConfig();
-  const client = new ApiClient(config);
-
+/**
+ * Собирает полностью укомплектованный экземпляр сервера.
+ *
+ * serveStdio вызывает фабрику один раз на соединение и «прикалывает» результат
+ * к выбранной в открывающем обмене эре протокола, поэтому регистрация
+ * инструментов обязана жить здесь, а не в main().
+ */
+function buildServer(client: ApiClient): McpServer {
   const server = new McpServer({
     name: "monoproject-mcp",
     version: "1.0.0",
@@ -63,11 +67,25 @@ async function main() {
   registerDependencyTools(server, client);
   registerWorkflowTools(server, client);
 
-  const transport = new StdioServerTransport();
-  await server.connect(transport);
+  return server;
 }
 
-main().catch((err) => {
+function main() {
+  const config = loadConfig();
+  const client = new ApiClient(config);
+
+  // legacy: 'serve' (по умолчанию) — одно и то же соединение обслуживает как
+  // ревизию 2026-07-28, так и 2025-era initialize.
+  // serveStdio синхронный, поэтому внеполосные ошибки транспорта не попадут в
+  // try/catch ниже — их забирает onerror (раньше это делал main().catch()).
+  serveStdio(() => buildServer(client), {
+    onerror: (err) => console.error("Transport error:", err),
+  });
+}
+
+try {
+  main();
+} catch (err) {
   console.error("Fatal:", err);
   process.exit(1);
-});
+}

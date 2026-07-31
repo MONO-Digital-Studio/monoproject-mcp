@@ -1,4 +1,4 @@
-import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import type { McpServer } from "@modelcontextprotocol/server";
 import { z } from "zod";
 import type { ApiClient } from "../client.js";
 import { ok, run, formatCustomField, formatList } from "../format.js";
@@ -89,7 +89,9 @@ export function registerCustomFieldTools(server: McpServer, client: ApiClient) {
         task_id: z.string().describe("Task UUID"),
         fields: z.array(z.object({
           field_definition_id: z.string().describe("Custom field definition UUID"),
-          value: z.any().describe("Field value (type depends on field_type)"),
+          // .optional() сохраняет контракт zod 3: там z.any() допускал отсутствие ключа,
+          // в zod 4 z.any() стал обязательным (required) и ужесточил бы схему инструмента.
+          value: z.any().optional().describe("Field value (type depends on field_type)"),
         })).describe("Array of {field_definition_id, value} pairs"),
       }),
     },

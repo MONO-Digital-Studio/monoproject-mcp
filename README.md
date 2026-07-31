@@ -149,8 +149,9 @@ src/
 ## Tech Stack
 
 - TypeScript 5.7+ (strict mode, ES2022)
-- [@modelcontextprotocol/sdk](https://github.com/modelcontextprotocol/typescript-sdk) — MCP protocol
-- [zod](https://github.com/colinhacks/zod) — input schema validation
+- [@modelcontextprotocol/server](https://github.com/modelcontextprotocol/typescript-sdk) v2 — MCP protocol
+  (serves both the 2025-era revisions and 2026-07-28 over stdio via `serveStdio`)
+- [zod](https://github.com/colinhacks/zod) 4 — input schema validation
 - Node.js 20+
 
 ## License

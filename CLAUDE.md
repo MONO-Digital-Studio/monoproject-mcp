@@ -16,7 +16,8 @@ npm run typecheck  # Type check without emit
 
 ## Architecture
 
-- `src/index.ts` — entry point, registers all tool groups
+- `src/index.ts` — entry point: `buildServer()` регистрирует все группы инструментов,
+  `serveStdio(() => buildServer(client))` обслуживает соединение
 - `src/client.ts` — HTTP client (auth, retry/backoff on 429 & 5xx, error handling, response parsing)
 - `src/config.ts` — env vars: MONO_API_URL, MONO_API_TOKEN, MONO_WORKSPACE_ID
 - `src/format.ts` — response formatters (convert API JSON → human-readable text)
@@ -70,7 +71,8 @@ import { ok, run } from "../format"; // wrong — runtime error
 
 1. Create `src/tools/<name>.ts` with `export function register<Name>Tools(server, client)`
 2. Export from `src/tools/index.ts`
-3. Import and call in `src/index.ts`
+3. Import и вызвать внутри `buildServer()` в `src/index.ts` (не в `main()` — фабрика
+   вызывается на каждое соединение)
 4. Add formatter in `src/format.ts` if the response has structured data
 5. `npm run build`
 
