@@ -101,7 +101,10 @@ Installing straight from GitHub also works (the `prepare` hook builds `dist/`):
 
 Bump `version` in `package.json` → merge → create a GitHub Release with tag
 `vX.Y.Z` — the `Release (npm publish)` workflow publishes to npm with
-`--provenance` (requires the `NPM_TOKEN` repo secret).
+`--provenance`. No npm token is involved: the package trusts this repository
+and the `release.yml` workflow via OIDC ([trusted
+publishing](https://docs.npmjs.com/trusted-publishers)), so renaming that
+workflow file breaks publishing until the trust setting is updated on npmjs.com.
 
 ## Architecture
 
