@@ -1,12 +1,17 @@
-# npm publish с provenance (MPJ-286).
+# npm publish через trusted publishing — OIDC вместо токена (MPJ-286, MPJ-344).
 #
 # Триггер: публикация GitHub Release (тег vX.Y.Z) или ручной запуск.
 # Требования:
-#   - секрет NPM_TOKEN (granular access token с publish-правом на пакет
-#     monoproject-mcp) в Settings → Secrets → Actions;
-#   - версия в package.json == тегу релиза (проверяется шагом ниже).
-# provenance подписывает пакет через GitHub OIDC (id-token: write) —
-# на npmjs.com появляется бейдж происхождения сборки.
+#   - на npmjs.com у пакета настроен trusted publisher: этот репозиторий
+#     + имя ЭТОГО файла (release.yml), без environment;
+#   - версия в package.json == тегу релиза (проверяется шагом ниже);
+#   - npm CLI >= 11.5.1 и Node >= 22.14 — иначе npm не умеет обмен OIDC-токена
+#     и падает на 404/ENEEDAUTH (поэтому node 24 + явный npm@latest ниже).
+# Долгоживущего NPM_TOKEN нет: npm получает короткоживущий токен по OIDC,
+# provenance подписывается тем же id-token.
+#
+# Переименование этого файла ломает публикацию: trusted publisher привязан
+# к имени workflow-файла. Меняешь имя — меняй и настройку на npmjs.com.
 
 name: Release (npm publish)
 
@@ -17,7 +22,7 @@ on:
 
 permissions:
   contents: read
-  id-token: write # OIDC для npm --provenance
+  id-token: write # OIDC: и авторизация публикации, и provenance
 
 jobs:
   publish:
@@ -26,8 +31,11 @@ jobs:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
-          node-version: "20"
+          node-version: "24"
           registry-url: "https://registry.npmjs.org"
+      # Node 24 приносит npm 11.x, но точный минор не гарантирован — фиксируем
+      # явно, чтобы обмен OIDC-токена был доступен независимо от образа раннера.
+      - run: npm install -g npm@latest
       - name: Verify tag matches package.json version
         if: github.event_name == 'release'
         env:
@@ -43,7 +51,8 @@ jobs:
       # build выполнит prepublishOnly внутри npm publish, но гоняем явно,
       # чтобы падение сборки было отдельным шагом, а не внутри publish.
       - run: npm run build
-      - name: Publish to npm (provenance)
+      # Токена нет намеренно: npm обменивает OIDC id-token на короткоживущий
+      # publish-токен сам. --provenance оставлен явно — при trusted publishing
+      # он избыточен по докам, но без него встречаются отказы публикации.
+      - name: Publish to npm (OIDC + provenance)
         run: npm publish --provenance
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
