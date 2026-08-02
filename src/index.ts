@@ -1,4 +1,5 @@
 #!/usr/bin/env node
+import { createRequire } from "node:module";
 import { serveStdio } from "@modelcontextprotocol/server/stdio";
 import { McpServer } from "@modelcontextprotocol/server";
 import { loadConfig } from "./config.js";
@@ -36,10 +37,17 @@ import {
  * к выбранной в открывающем обмене эре протокола, поэтому регистрация
  * инструментов обязана жить здесь, а не в main().
  */
+// Read from the manifest instead of repeating the number here: a hardcoded
+// "1.0.0" survived the 1.1.0 bump, so the server introduced itself to every
+// client under a version it hadn't been for a while.
+const { version: PACKAGE_VERSION } = createRequire(import.meta.url)(
+  "../package.json",
+) as { version: string };
+
 function buildServer(client: ApiClient): McpServer {
   const server = new McpServer({
     name: "monoproject-mcp",
-    version: "1.0.0",
+    version: PACKAGE_VERSION,
   });
 
   // Register all tool groups
