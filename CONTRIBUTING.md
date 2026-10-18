@@ -6,7 +6,7 @@ thin TypeScript client that exposes the MONOProject REST API as MCP tools.
 ## Development setup
 
 ```bash
-git clone https://github.com/MONO-Digital-Studio/monoproject-mcp.git
+git clone git@gitlab.com:monostudio/monoproject/monoproject-mcp.git
 cd monoproject-mcp
 npm install
 cp .env.example .env   # fill in MONO_API_URL, MONO_API_TOKEN, MONO_WORKSPACE_ID

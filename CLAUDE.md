@@ -19,7 +19,7 @@ npm run typecheck  # Type check without emit
 - `src/index.ts` — entry point: `buildServer()` регистрирует все группы инструментов,
   `serveStdio(() => buildServer(client))` обслуживает соединение
 - `src/client.ts` — HTTP client (auth, retry/backoff on 429 & 5xx, error handling, response parsing)
-- `src/config.ts` — env vars: MONO_API_URL, MONO_API_TOKEN, MONO_WORKSPACE_ID
+- `src/config.ts` — env vars: MONO_API_TOKEN (required), MONO_API_URL and MONO_WORKSPACE_ID (with defaults)
 - `src/format.ts` — response formatters (convert API JSON → human-readable text)
 - `src/tools/` — 23 tool modules, each exports a `register*Tools(server, client)` function
 
@@ -84,11 +84,13 @@ All tool responses go through `src/format.ts` formatters — never return raw JS
 
 ## Environment Variables
 
-| Var                 | Description                                         |
-| ------------------- | --------------------------------------------------- |
-| `MONO_API_URL`      | API base URL, e.g. `https://monoproject.dev/api/v1` |
-| `MONO_API_TOKEN`    | Bearer token (create in Settings → API Tokens)      |
-| `MONO_WORKSPACE_ID` | Default workspace UUID                              |
+| Var                 | Required | Default                          | Description                                    |
+| ------------------- | -------- | -------------------------------- | ---------------------------------------------- |
+| `MONO_API_TOKEN`    | yes      | —                                | Bearer token (create in Settings → API Tokens) |
+| `MONO_API_URL`      | no       | `https://monoproject.dev/api/v1` | API base URL                                   |
+| `MONO_WORKSPACE_ID` | no       | `mono`                           | Default workspace UUID or slug                 |
+
+Defaults live in `src/config.ts` (`DEFAULT_API_URL`, `DEFAULT_WORKSPACE_ID`).
 
 ## Backend API Reference
 

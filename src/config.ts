@@ -1,7 +1,11 @@
 /**
  * Configuration loaded from environment variables.
- * Required: MONO_API_URL, MONO_API_TOKEN, MONO_WORKSPACE_ID
+ * Required: MONO_API_TOKEN. MONO_API_URL and MONO_WORKSPACE_ID are optional
+ * and fall back to the MONO Studio defaults below.
  */
+
+export const DEFAULT_API_URL = "https://monoproject.dev/api/v1";
+export const DEFAULT_WORKSPACE_ID = "mono";
 
 export interface Config {
   apiUrl: string;
@@ -10,13 +14,12 @@ export interface Config {
 }
 
 export function loadConfig(): Config {
-  const apiUrl = process.env.MONO_API_URL;
+  // An empty value counts as unset, so `MONO_API_URL=` in .env keeps the default.
+  const apiUrl = process.env.MONO_API_URL || DEFAULT_API_URL;
   const apiToken = process.env.MONO_API_TOKEN;
-  const workspaceId = process.env.MONO_WORKSPACE_ID;
+  const workspaceId = process.env.MONO_WORKSPACE_ID || DEFAULT_WORKSPACE_ID;
 
-  if (!apiUrl) throw new Error("MONO_API_URL is required");
   if (!apiToken) throw new Error("MONO_API_TOKEN is required");
-  if (!workspaceId) throw new Error("MONO_WORKSPACE_ID is required");
 
   return {
     apiUrl: apiUrl.replace(/\/+$/, ""),

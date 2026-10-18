@@ -28,6 +28,7 @@ import {
   registerDeployTools,
   registerDependencyTools,
   registerWorkflowTools,
+  registerAcceleratorTools,
 } from "./tools/index.js";
 
 /**
@@ -74,6 +75,7 @@ function buildServer(client: ApiClient): McpServer {
   registerDeployTools(server, client);
   registerDependencyTools(server, client);
   registerWorkflowTools(server, client);
+  registerAcceleratorTools(server, client);
 
   return server;
 }

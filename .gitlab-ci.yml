@@ -1,0 +1,20 @@
+stages: [test]
+
+workflow:
+  rules:
+    - if: $CI_PIPELINE_SOURCE == "merge_request_event"
+    - if: $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH
+    - if: $CI_PIPELINE_SOURCE == "web"
+
+default:
+  image: node:24-bookworm-slim
+  tags: [msk]
+  retry:
+    max: 2
+    when: [runner_system_failure, api_failure]
+
+verify:
+  stage: test
+  script:
+    - npm ci
+    - npm run gate

@@ -5,6 +5,17 @@
 
 /* eslint-disable @typescript-eslint/no-explicit-any */
 
+export {
+  formatAcceleratorList,
+  formatAcceleratorDetail,
+  formatAcceleratorWorkspaces,
+  formatAcceleratorDashboard,
+  formatAcceleratorProgress,
+  formatWorkspaceEduProgress,
+  formatAcceleratorReports,
+  formatAcceleratorReport,
+} from "./format-accelerators.js";
+
 /** Format task for lists — description truncated to 200 chars. */
 export function formatTask(t: any): string {
   const parts = _formatTaskHeader(t);
